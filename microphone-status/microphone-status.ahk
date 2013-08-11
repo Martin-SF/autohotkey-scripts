@@ -15,18 +15,34 @@ VERSION := "0.0.1"
 #NoEnv
 
 ; TODO: move to config file / create a config screen
-device_id := 8
-component_type := "Master"
+;device_id := 8
+;component_type := "Master"
+IniRead, device_id, config.ini, sound_device, device_id
+IniRead, component_type, config.ini, sound_device, component_type
+IniRead, always_on_top, config.ini, app, always_on_top, True
 
 ; shouldn't have to change these
 refresh_rate := 2000  ; in msec, 500 is probably as low as you should go
 muted_img := "img_muted.png"
 unmuted_img := "img_unmuted.png"
 
+; Error Checking
+if (FileExist(muted_img) = "") {
+    MsgBox, Muted image file %muted_img% does not exist
+    ExitApp
+}
+if (FileExist(unmuted_img) = "") {
+    MsgBox, Unmuted image file %unmuted_img% does not exist
+    ExitApp
+}
+
 gosub GetMicrophoneStatus
 
-; TODO: let AlwaysOnTop be configurable
-Gui +AlwaysOnTop
+gui_options := ""
+if always_on_top = True
+    gui_options := "+AlwaysOnTop"
+
+Gui %gui_options%
 Gui Add, Picture, vMicStatus gToggleMic, %microphone_status%
 Gui Show,, Microphone Status
 
@@ -45,8 +61,10 @@ return
 ; sets the microphone_status variable
 GetMicrophoneStatus:
     SoundGet, microphone_state, %component_type%, Mute, %device_id%
-    if ErrorLevel
+    if ErrorLevel {
         MsgBox, Could not get microphone state: %ErrorLevel%
+        ExitApp
+    }
 
     ; On = Mute is confusing
     if microphone_state = On
