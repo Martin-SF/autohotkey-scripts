@@ -7,7 +7,7 @@
  *     - AutoHotkey v1.1.+ (maybe)
  */
 
-VERSION := "0.0.1"
+VERSION := "0.2.0"
 
 ; BUG: if some fatal error happens and app closes it doesn't close the whole
 ; application. Thus needs this to say only have one running.
