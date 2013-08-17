@@ -20,6 +20,7 @@ VERSION := "0.0.1"
 IniRead, device_id, config.ini, sound_device, device_id
 IniRead, component_type, config.ini, sound_device, component_type
 IniRead, always_on_top, config.ini, app, always_on_top, True
+IniRead, mute_hotkey, config.ini, app, mute_hotkey, ^!m
 
 ; shouldn't have to change these
 refresh_rate := 2000  ; in msec, 500 is probably as low as you should go
@@ -43,19 +44,28 @@ if always_on_top = True
     gui_options := "+AlwaysOnTop"
 
 Gui %gui_options%
-Gui Add, Picture, vMicStatus gToggleMic, %microphone_status%
+Gui Add, Picture, vMicStatus gToggleMicOnClick, %microphone_status%
 Gui Show,, Microphone Status
 
 SetTimer, UpdateMicrophoneStatus, %refresh_rate%
 
+Hotkey, %mute_hotkey%, ToggleMicOnHotkey
+
 return
 
 
-; Toggles the microphone status
-ToggleMic:
+; Toggles the microphone status when double-clicked
+ToggleMicOnClick:
     if (A_GuiEvent = "DoubleClick")
         SoundSet, +1, %component_type%, Mute, %device_id%
         gosub UpdateMicrophoneStatus
+return
+
+; Toggles the microphone status when hotkey is used
+; Had to be separate function for the double click check to work
+ToggleMicOnHotkey:
+    SoundSet, +1, %component_type%, Mute, %device_id%
+    gosub UpdateMicrophoneStatus
 return
 
 ; sets the microphone_status variable
