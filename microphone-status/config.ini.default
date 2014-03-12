@@ -1,6 +1,6 @@
 [sound_device]
 component_type=Master
-device_id=8
+device_id=10
 
 [app]
 always_on_top=True
